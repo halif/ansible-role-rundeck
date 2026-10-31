@@ -1,0 +1,21 @@
+---
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg2
+      - apt-transport-https
+    state: present
+    update_cache: true
+
+- name: Add Rundeck packagecloud repository
+  ansible.builtin.shell: |
+    curl -fsSL https://packagecloud.io/install/repositories/pagerduty/rundeck/script.deb.sh | bash
+  args:
+    creates: /etc/apt/sources.list.d/pagerduty_rundeck.list
+
+- name: Install Rundeck package
+  ansible.builtin.apt:
+    name: "{{ rundeck_package_name }}{{ ('=' + rundeck_version) if rundeck_version != 'latest' else '' }}"
+    state: "{{ rundeck_package_state }}"
+    update_cache: true

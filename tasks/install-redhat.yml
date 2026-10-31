@@ -1,0 +1,17 @@
+---
+- name: Install prerequisites
+  ansible.builtin.yum:
+    name:
+      - curl
+    state: present
+
+- name: Add Rundeck packagecloud repository
+  ansible.builtin.shell: |
+    curl -fsSL https://packagecloud.io/install/repositories/pagerduty/rundeck/script.rpm.sh | bash
+  args:
+    creates: /etc/yum.repos.d/pagerduty_rundeck.repo
+
+- name: Install Rundeck package
+  ansible.builtin.yum:
+    name: "{{ rundeck_package_name }}{{ ('-' + rundeck_version) if rundeck_version != 'latest' else '' }}"
+    state: "{{ rundeck_package_state }}"

@@ -1,0 +1,48 @@
+---
+rundeck_version: "5.1.0"          # версия пакета, можно "latest"
+rundeck_package_state: present
+
+rundeck_user: rundeck
+rundeck_group: rundeck
+
+rundeck_home: /var/lib/rundeck
+rundeck_config_dir: /etc/rundeck
+rundeck_log_dir: /var/log/rundeck
+rundeck_base_dir: /var/lib/rundeck
+
+rundeck_service_name: rundeckd
+rundeck_service_enabled: true
+rundeck_service_state: started
+
+# Java
+rundeck_install_java: true
+rundeck_java_package_debian: openjdk-17-jre-headless
+rundeck_java_package_redhat: java-17-openjdk-headless
+
+# Сеть / URL, под которым Rundeck доступен снаружи
+rundeck_server_hostname: "{{ ansible_fqdn | default(ansible_default_ipv4.address) }}"
+rundeck_server_port: 4440
+rundeck_grails_server_url: "http://{{ rundeck_server_hostname }}:{{ rundeck_server_port }}"
+
+# JVM
+rundeck_java_opts: "-Xmx1024m -Xms256m -server"
+
+# БД (по умолчанию встроенная H2/HSQLDB, для прод — вынести в MySQL/PostgreSQL)
+rundeck_database_driver: "org.h2.Driver"
+rundeck_database_url: "jdbc:h2:file:{{ rundeck_base_dir }}/data/grailsdb;MVCC=true"
+rundeck_database_username: ""
+rundeck_database_password: ""
+
+# Админ-пользователь (realm.properties, basic auth)
+rundeck_admin_user: admin
+rundeck_admin_password: "ChangeMe123!"
+rundeck_users:
+  - username: "{{ rundeck_admin_user }}"
+    password: "{{ rundeck_admin_password }}"
+    roles: "admin,user,architect,deploy,build"
+
+# Прочие framework-настройки (ключ/значение)
+rundeck_framework_properties: {}
+
+# Пакетный репозиторий (packagecloud)
+rundeck_repo_distro: "any/any"

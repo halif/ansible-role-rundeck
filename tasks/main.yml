@@ -1,0 +1,26 @@
+---
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_os_family | lower }}.yml"
+
+- name: Install Java
+  ansible.builtin.package:
+    name: "{{ rundeck_java_package }}"
+    state: present
+  when: rundeck_install_java | bool
+
+- name: Install Rundeck on Debian/Ubuntu
+  ansible.builtin.include_tasks: install-debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Install Rundeck on RedHat/CentOS
+  ansible.builtin.include_tasks: install-redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Configure Rundeck
+  ansible.builtin.include_tasks: configure.yml
+
+- name: Ensure Rundeck service is enabled/started
+  ansible.builtin.systemd:
+    name: "{{ rundeck_service_name }}"
+    enabled: "{{ rundeck_service_enabled }}"
+    state: "{{ rundeck_service_state }}"

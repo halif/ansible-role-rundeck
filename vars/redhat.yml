@@ -1,0 +1,3 @@
+---
+rundeck_java_package: "{{ rundeck_java_package_redhat }}"
+rundeck_package_name: rundeck

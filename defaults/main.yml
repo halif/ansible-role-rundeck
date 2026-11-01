@@ -1,48 +1,31 @@
----
-rundeck_version: "5.1.0.20240214-1"          # версия пакета, можно "latest"
-rundeck_package_state: present
+# Тип базы данных: h2 (по умолчанию), mysql, postgresql
+rundeck_database_type: h2
 
-rundeck_user: rundeck
-rundeck_group: rundeck
+rundeck_database_host: "localhost"
+rundeck_database_port: "{{ '3306' if rundeck_database_type == 'mysql' else '5432' }}"
+rundeck_database_name: "rundeck"
+rundeck_database_username: "rundeck"
+rundeck_database_password: "rundeck"
 
-rundeck_home: /var/lib/rundeck
-rundeck_config_dir: /etc/rundeck
-rundeck_log_dir: /var/log/rundeck
-rundeck_base_dir: /var/lib/rundeck
+rundeck_database_url: >-
+  {%- if rundeck_database_type == 'mysql' -%}
+  jdbc:mysql://{{ rundeck_database_host }}:{{ rundeck_database_port }}/{{ rundeck_database_name }}?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+  {%- elif rundeck_database_type == 'postgresql' -%}
+  jdbc:postgresql://{{ rundeck_database_host }}:{{ rundeck_database_port }}/{{ rundeck_database_name }}
+  {%- else -%}
+  jdbc:h2:file:/var/lib/rundeck/data/grailsdb;NON_KEYWORDS=MONTH,HOUR,MINUTE,YEAR,SECONDS;DB_CLOSE_ON_EXIT=FALSE
+  {%- endif -%}
 
-rundeck_service_name: rundeckd
-rundeck_service_enabled: true
-rundeck_service_state: started
+rundeck_database_driver: >-
+  {%- if rundeck_database_type == 'mysql' -%}
+  com.mysql.cj.jdbc.Driver
+  {%- elif rundeck_database_type == 'postgresql' -%}
+  org.postgresql.Driver
+  {%- else -%}
+  org.h2.Driver
+  {%- endif -%}
 
-# Java
-rundeck_install_java: true
-rundeck_java_package_debian: openjdk-17-jre-headless
-rundeck_java_package_redhat: java-17-openjdk-headless
+rundeck_jdbc_mysql_version: "8.0.33"
+rundeck_jdbc_postgresql_version: "42.7.3"
 
-# Сеть / URL, под которым Rundeck доступен снаружи
-rundeck_server_hostname: "{{ ansible_fqdn | default(ansible_default_ipv4.address) }}"
-rundeck_server_port: 4440
-rundeck_grails_server_url: "http://{{ rundeck_server_hostname }}:{{ rundeck_server_port }}"
-
-# JVM
-rundeck_java_opts: "-Xmx1024m -Xms256m -server"
-
-# БД (по умолчанию встроенная H2/HSQLDB, для прод — вынести в MySQL/PostgreSQL)
-rundeck_database_driver: "org.h2.Driver"
-rundeck_database_url: "jdbc:h2:file:{{ rundeck_base_dir }}/data/grailsdb;MVCC=true"
-rundeck_database_username: ""
-rundeck_database_password: ""
-
-# Админ-пользователь (realm.properties, basic auth)
-rundeck_admin_user: admin
-rundeck_admin_password: ""
-rundeck_users:
-  - username: "{{ rundeck_admin_user }}"
-    password: "{{ rundeck_admin_password }}"
-    roles: "admin,user,architect,deploy,build"
-
-# Прочие framework-настройки (ключ/значение)
-rundeck_framework_properties: {}
-
-# Пакетный репозиторий (packagecloud)
-rundeck_repo_distro: "any/any"
+rundeck_jdbc_lib_dir: "/var/lib/rundeck/lib"

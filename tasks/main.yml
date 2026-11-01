@@ -10,10 +10,16 @@
     update_cache: false
   when: ansible_distribution == "Ubuntu"
 
-- name: Update APT package cache
-  ansible.builtin.apt:
-    update_cache: true
-  when: ansible_os_family == "Debian"
+- name: Ensure Java man directory exists
+  ansible.builtin.file:
+    path: /usr/share/man/man1
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when:
+    - ansible_os_family == "Debian"
+    - rundeck_install_java | bool
 
 - name: Install Java
   ansible.builtin.package:

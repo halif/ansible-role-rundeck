@@ -1,14 +1,12 @@
+
 ---
 - name: Include OS-specific variables
   ansible.builtin.include_vars: "{{ ansible_os_family | lower }}.yml"
 
-- name: Enable Ubuntu Universe repository
-  ansible.builtin.apt_repository:
-    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
-    filename: ubuntu-universe
-    state: present
-    update_cache: false
-  when: ansible_distribution == "Ubuntu"
+- name: Update APT package cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_os_family == "Debian"
 
 - name: Ensure Java man directory exists
   ansible.builtin.file:

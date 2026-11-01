@@ -1,5 +1,6 @@
 ---
 # Тип базы данных: h2 (по умолчанию), mysql, postgresql
+rundeck_version: "5.1.0.20240214-1"
 rundeck_database_type: h2
 rundeck_install_java: true
 

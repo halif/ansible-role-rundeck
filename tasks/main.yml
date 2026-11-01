@@ -2,6 +2,19 @@
 - name: Include OS-specific variables
   ansible.builtin.include_vars: "{{ ansible_os_family | lower }}.yml"
 
+- name: Enable Ubuntu Universe repository
+  ansible.builtin.apt_repository:
+    repo: "deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe"
+    filename: ubuntu-universe
+    state: present
+    update_cache: false
+  when: ansible_distribution == "Ubuntu"
+
+- name: Update APT package cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_os_family == "Debian"
+
 - name: Install Java
   ansible.builtin.package:
     name: "{{ rundeck_java_package }}"
@@ -19,7 +32,7 @@
 - name: Configure Rundeck
   ansible.builtin.include_tasks: configure.yml
 
-- name: Ensure Rundeck service is enabled/started
+- name: Ensure Rundeck service is enabled and started
   ansible.builtin.systemd:
     name: "{{ rundeck_service_name }}"
     enabled: "{{ rundeck_service_enabled }}"

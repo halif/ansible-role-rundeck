@@ -1,6 +1,7 @@
 ---
 # Тип базы данных: h2 (по умолчанию), mysql, postgresql
 rundeck_database_type: h2
+rundeck_install_java: true
 
 rundeck_database_host: "localhost"
 rundeck_database_port: "{{ '3306' if rundeck_database_type == 'mysql' else '5432' }}"

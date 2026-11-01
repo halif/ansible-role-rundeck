@@ -3,6 +3,10 @@
 rundeck_database_type: h2
 rundeck_install_java: true
 
+# Java packages by OS family
+rundeck_java_package_debian: "openjdk-17-jre-headless"
+rundeck_java_package_redhat: "java-17-openjdk-headless"
+
 rundeck_database_host: "localhost"
 rundeck_database_port: "{{ '3306' if rundeck_database_type == 'mysql' else '5432' }}"
 rundeck_database_name: "rundeck"

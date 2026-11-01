@@ -10,9 +10,24 @@ rundeck_database_password: "rundeck"
 
 rundeck_database_url: >-
   {%- if rundeck_database_type == 'mysql' -%}
-  jdbc:mysql://{{ rundeck_database_host }}:{{ rundeck_database_port }}/{{ rundeck_database_name }}?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+  {{
+    'jdbc:mysql://'
+    ~ rundeck_database_host
+    ~ ':'
+    ~ rundeck_database_port
+    ~ '/'
+    ~ rundeck_database_name
+    ~ '?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true'
+  }}
   {%- elif rundeck_database_type == 'postgresql' -%}
-  jdbc:postgresql://{{ rundeck_database_host }}:{{ rundeck_database_port }}/{{ rundeck_database_name }}
+  {{
+    'jdbc:postgresql://'
+    ~ rundeck_database_host
+    ~ ':'
+    ~ rundeck_database_port
+    ~ '/'
+    ~ rundeck_database_name
+  }}
   {%- else -%}
   jdbc:h2:file:/var/lib/rundeck/data/grailsdb;NON_KEYWORDS=MONTH,HOUR,MINUTE,YEAR,SECONDS;DB_CLOSE_ON_EXIT=FALSE
   {%- endif -%}

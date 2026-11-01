@@ -119,23 +119,65 @@ jobs:
           echo "===== Container inspect ====="
           docker inspect "$CONTAINER_ID" || true
 
-          echo "===== Rundeck service ====="
+          echo "===== Rundeck service status ====="
           docker exec "$CONTAINER_ID" \
             systemctl status rundeckd.service --no-pager || true
 
-          echo "===== Rundeck journal ====="
+          echo "===== Rundeck systemd journal ====="
           docker exec "$CONTAINER_ID" \
-            journalctl -u rundeckd.service \
+            journalctl -xeu rundeckd.service \
             --no-pager \
-            -n 150 || true
+            -n 200 || true
+
+          echo "===== Rundeck service.log ====="
+          docker exec "$CONTAINER_ID" bash -lc '
+            if [ -f /var/log/rundeck/service.log ]; then
+              tail -n 200 /var/log/rundeck/service.log
+            else
+              echo "service.log not found"
+            fi
+          ' || true
+
+          echo "===== Rundeck rundeck.log ====="
+          docker exec "$CONTAINER_ID" bash -lc '
+            if [ -f /var/log/rundeck/rundeck.log ]; then
+              tail -n 200 /var/log/rundeck/rundeck.log
+            else
+              echo "rundeck.log not found"
+            fi
+          ' || true
+
+          echo "===== Rundeck log directory ====="
+          docker exec "$CONTAINER_ID" \
+            ls -lah /var/log/rundeck/ || true
 
           echo "===== Failed services ====="
           docker exec "$CONTAINER_ID" \
             systemctl --failed --no-pager || true
 
+          echo "===== Java version ====="
+          docker exec "$CONTAINER_ID" java -version 2>&1 || true
+
+          echo "===== Java environment ====="
+          docker exec "$CONTAINER_ID" \
+            printenv | grep -E 'JAVA|RDECK|RUNDECK' || true
+
           echo "===== Rundeck processes ====="
           docker exec "$CONTAINER_ID" \
             ps auxww | grep -Ei '[r]undeck|[j]ava' || true
+
+          echo "===== Rundeck configuration ====="
+          docker exec "$CONTAINER_ID" bash -lc '
+            for file in \
+              /etc/rundeck/rundeck-config.properties \
+              /etc/rundeck/framework.properties \
+              /etc/rundeck/realm.properties; do
+              if [ -f "$file" ]; then
+                echo "===== $file ====="
+                sed -E "s/(password|token|secret)([^=]*=[[:space:]]*).*/\1\2[REDACTED]/I" "$file"
+              fi
+            done
+          ' || true
 
       - name: Molecule destroy
         if: always()

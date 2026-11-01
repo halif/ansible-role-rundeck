@@ -16,7 +16,7 @@ galaxy_info:
   galaxy_tags:
     - rundeck
     - automation
-    - job-scheduler
+    - jobscheduler
     - devops
 
 dependencies: []

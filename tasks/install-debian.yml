@@ -8,10 +8,18 @@
     state: present
     update_cache: true
 
-- name: Add Rundeck packagecloud repository
-  ansible.builtin.shell: |
-    curl -fsSL https://packagecloud.io/install/repositories/pagerduty/rundeck/script.deb.sh | bash
-  args:
+- name: Download Rundeck APT repository setup script
+  ansible.builtin.get_url:
+    url: https://packagecloud.io/install/repositories/pagerduty/rundeck/script.deb.sh
+    dest: /tmp/rundeck-packagecloud-deb.sh
+    mode: "0755"
+    force: false
+
+- name: Add Rundeck APT repository
+  ansible.builtin.command:
+    argv:
+      - bash
+      - /tmp/rundeck-packagecloud-deb.sh
     creates: /etc/apt/sources.list.d/pagerduty_rundeck.list
 
 - name: Install Rundeck package

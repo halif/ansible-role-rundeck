@@ -27,7 +27,7 @@
     owner: "{{ rundeck_user }}"
     group: "{{ rundeck_group }}"
     mode: "0640"
-  notify: restart rundeck
+  notify: Restart Rundeck
 
 - name: Deploy realm.properties (basic auth users)
   ansible.builtin.template:
@@ -36,7 +36,7 @@
     owner: "{{ rundeck_user }}"
     group: "{{ rundeck_group }}"
     mode: "0640"
-  notify: restart rundeck
+  notify: Restart Rundeck
 
 - name: Deploy JVM profile (RDECK_JVM / RUNDECK_JAVA_OPTS)
   ansible.builtin.template:
@@ -45,4 +45,4 @@
     owner: "{{ rundeck_user }}"
     group: "{{ rundeck_group }}"
     mode: "0640"
-  notify: restart rundeck
+  notify: Restart Rundeck

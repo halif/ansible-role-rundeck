@@ -10,23 +10,37 @@
 
 - name: Download MySQL JDBC driver
   ansible.builtin.get_url:
-    url: "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/{{ rundeck_jdbc_mysql_version }}/mysql-connector-j-{{ rundeck_jdbc_mysql_version }}.jar"
+    url: >-
+      {{
+        'https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/'
+        ~ rundeck_jdbc_mysql_version
+        ~ '/mysql-connector-j-'
+        ~ rundeck_jdbc_mysql_version
+        ~ '.jar'
+      }}
     dest: "{{ rundeck_jdbc_lib_dir }}/mysql-connector-j-{{ rundeck_jdbc_mysql_version }}.jar"
     owner: rundeck
     group: rundeck
     mode: "0644"
   when: rundeck_database_type == 'mysql'
-  notify: restart rundeck
+  notify: Restart Rundeck
 
 - name: Download PostgreSQL JDBC driver
   ansible.builtin.get_url:
-    url: "https://repo1.maven.org/maven2/org/postgresql/postgresql/{{ rundeck_jdbc_postgresql_version }}/postgresql-{{ rundeck_jdbc_postgresql_version }}.jar"
+    url: >-
+      {{
+        'https://repo1.maven.org/maven2/org/postgresql/postgresql/'
+        ~ rundeck_jdbc_postgresql_version
+        ~ '/postgresql-'
+        ~ rundeck_jdbc_postgresql_version
+        ~ '.jar'
+      }}
     dest: "{{ rundeck_jdbc_lib_dir }}/postgresql-{{ rundeck_jdbc_postgresql_version }}.jar"
     owner: rundeck
     group: rundeck
     mode: "0644"
   when: rundeck_database_type == 'postgresql'
-  notify: restart rundeck
+  notify: Restart Rundeck
 
 - name: Ensure target database exists (PostgreSQL)
   community.postgresql.postgresql_db:

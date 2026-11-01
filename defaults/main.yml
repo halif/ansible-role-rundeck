@@ -1,3 +1,4 @@
+---
 # Тип базы данных: h2 (по умолчанию), mysql, postgresql
 rundeck_database_type: h2
 

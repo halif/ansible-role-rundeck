@@ -18,7 +18,7 @@
     owner: "{{ rundeck_user }}"
     group: "{{ rundeck_group }}"
     mode: "0640"
-  notify: restart rundeck
+  notify: Restart Rundeck
 
 - name: Deploy framework.properties
   ansible.builtin.template:

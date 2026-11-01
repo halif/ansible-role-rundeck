@@ -1,5 +1,5 @@
 ---
-rundeck_version: "5.1.0"          # версия пакета, можно "latest"
+rundeck_version: "5.1.0.20240214-1"          # версия пакета, можно "latest"
 rundeck_package_state: present
 
 rundeck_user: rundeck

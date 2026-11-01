@@ -61,3 +61,17 @@ rundeck_jdbc_mysql_version: "8.0.33"
 rundeck_jdbc_postgresql_version: "42.7.3"
 
 rundeck_jdbc_lib_dir: "/var/lib/rundeck/lib"
+
+rundeck_java_opts: "-Xmx1024m -Xms256m -server"
+rundeck_admin_user: admin
+rundeck_admin_password: ""
+rundeck_users:
+  - username: "{{ rundeck_admin_user }}"
+    password: "{{ rundeck_admin_password }}"
+    roles: "admin,user,architect,deploy,build"
+
+# Прочие framework-настройки (ключ/значение)
+rundeck_framework_properties: {}
+
+# Пакетный репозиторий (packagecloud)
+rundeck_repo_distro: "any/any"

@@ -1,0 +1,14 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: ubuntu22
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    pre_build_image: true
+    privileged: true
+    command: "/lib/systemd/systemd"
+    cgroupns_mode: host
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

@@ -35,7 +35,7 @@ rundeck_database_password: ""
 
 # Админ-пользователь (realm.properties, basic auth)
 rundeck_admin_user: admin
-rundeck_admin_password: "ChangeMe123!"
+rundeck_admin_password: ""
 rundeck_users:
   - username: "{{ rundeck_admin_user }}"
     password: "{{ rundeck_admin_password }}"

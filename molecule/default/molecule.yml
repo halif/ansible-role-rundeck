@@ -1,6 +1,7 @@
 ---
 driver:
   name: docker
+
 platforms:
   - name: ubuntu22
     image: geerlingguy/docker-ubuntu2204-ansible:latest
@@ -8,7 +9,14 @@ platforms:
     privileged: true
     command: "/lib/systemd/systemd"
     cgroupns_mode: host
+
 provisioner:
   name: ansible
+
+  config_options:
+    defaults:
+      remote_tmp: /tmp
+      interpreter_python: auto_silent
+
 verifier:
   name: ansible

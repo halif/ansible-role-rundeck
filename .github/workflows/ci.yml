@@ -151,6 +151,38 @@ jobs:
           docker exec "$CONTAINER_ID" \
             ls -lah /var/log/rundeck/ || true
 
+          echo "===== Rundeck init script ====="
+          docker exec "$CONTAINER_ID" bash -lc '
+            grep -n -B 15 -A 25 -E \
+              "start-stop-daemon|--chdir|--make-pidfile|RDECK_BASE|RUNDECK_BASE" \
+              /etc/init.d/rundeckd || true
+          ' || true
+
+          echo "===== Rundeck default configuration ====="
+          docker exec "$CONTAINER_ID" bash -lc '
+            for file in /etc/default/rundeckd /etc/rundeck/profile; do
+              if [ -f "$file" ]; then
+                echo "===== $file ====="
+                grep -nE "RDECK|RUNDECK|JAVA|PID|USER|HOME" "$file" |
+                  sed -E "s/(PASSWORD|PASSWD|TOKEN|SECRET)([^=]*=[[:space:]]*).*/\1\2[REDACTED]/I" ||
+                  true
+              else
+                echo "$file not found"
+              fi
+            done
+          ' || true
+
+          echo "===== Rundeck directories ====="
+          docker exec "$CONTAINER_ID" \
+            ls -ld /var/lib/rundeck \
+            /var/lib/rundeck/data \
+            /var/log/rundeck \
+            /run || true
+
+          echo "===== Rundeck init script permissions ====="
+          docker exec "$CONTAINER_ID" \
+            ls -l /etc/init.d/rundeckd || true
+
           echo "===== Failed services ====="
           docker exec "$CONTAINER_ID" \
             systemctl --failed --no-pager || true
@@ -166,17 +198,23 @@ jobs:
           docker exec "$CONTAINER_ID" \
             ps auxww | grep -Ei '[r]undeck|[j]ava' || true
 
-          echo "===== Rundeck configuration ====="
+          echo "===== Rundeck configuration files ====="
           docker exec "$CONTAINER_ID" bash -lc '
             for file in \
               /etc/rundeck/rundeck-config.properties \
-              /etc/rundeck/framework.properties \
-              /etc/rundeck/realm.properties; do
+              /etc/rundeck/framework.properties; do
               if [ -f "$file" ]; then
                 echo "===== $file ====="
-                sed -E "s/(password|token|secret)([^=]*=[[:space:]]*).*/\1\2[REDACTED]/I" "$file"
+                sed -E \
+                  "s/(password|token|secret)([^=]*=[[:space:]]*).*/\1\2[REDACTED]/I" \
+                  "$file"
               fi
             done
+
+            if [ -f /etc/rundeck/realm.properties ]; then
+              echo "realm.properties exists (contents hidden)"
+              ls -l /etc/rundeck/realm.properties
+            fi
           ' || true
 
       - name: Molecule destroy

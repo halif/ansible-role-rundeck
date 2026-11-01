@@ -54,7 +54,7 @@
   delegate_to: "{{ rundeck_database_host }}"
 
 - name: Ensure target database exists (MySQL)
-  community.mysql.mysql_db:
+  ansible.mysql.mysql_db:
     name: "{{ rundeck_database_name }}"
     login_host: "{{ rundeck_database_host }}"
     login_user: "{{ rundeck_database_admin_user | default('root') }}"

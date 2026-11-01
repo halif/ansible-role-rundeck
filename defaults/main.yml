@@ -41,12 +41,9 @@ rundeck_database_url: >-
 
 rundeck_database_driver: >-
   {%- if rundeck_database_type == 'mysql' -%}
-  com.mysql.cj.jdbc.Driver
-  {%- elif rundeck_database_type == 'postgresql' -%}
-  org.postgresql.Driver
-  {%- else -%}
-  org.h2.Driver
-  {%- endif -%}
+  com.mysql.cj.jdbc.Driver{%- elif rundeck_database_type == 'postgresql' -%}
+  org.postgresql.Driver{%- else -%}
+  org.h2.Driver{%- endif -%}
 
 rundeck_jdbc_mysql_version: "8.0.33"
 rundeck_jdbc_postgresql_version: "42.7.3"

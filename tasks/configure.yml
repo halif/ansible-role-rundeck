@@ -38,11 +38,11 @@
     mode: "0640"
   notify: Restart Rundeck
 
-- name: Deploy JVM profile (RDECK_JVM / RUNDECK_JAVA_OPTS)
+- name: Deploy Rundeck service defaults
   ansible.builtin.template:
-    src: profile.j2
-    dest: "{{ rundeck_config_dir }}/profile"
-    owner: "{{ rundeck_user }}"
-    group: "{{ rundeck_group }}"
-    mode: "0640"
+    src: rundeckd.j2
+    dest: /etc/default/rundeckd
+    owner: root
+    group: root
+    mode: "0644"
   notify: Restart Rundeck

@@ -2,28 +2,44 @@
 - name: Install prerequisites
   ansible.builtin.apt:
     name:
-      - curl
-      - gnupg2
+      - ca-certificates
+      - gnupg
       - apt-transport-https
     state: present
     update_cache: true
 
-- name: Download Rundeck APT repository setup script
-  ansible.builtin.get_url:
-    url: https://packagecloud.io/install/repositories/pagerduty/rundeck/script.deb.sh
-    dest: /tmp/rundeck-packagecloud-deb.sh
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
     mode: "0755"
-    force: false
 
-- name: Add Rundeck APT repository
-  ansible.builtin.command:
-    argv:
-      - bash
-      - /tmp/rundeck-packagecloud-deb.sh
-    creates: /etc/apt/sources.list.d/pagerduty_rundeck.list
+- name: Remove obsolete Packagecloud repository
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/pagerduty_rundeck.list
+    state: absent
+
+- name: Download Rundeck repository signing key
+  ansible.builtin.get_url:
+    url: https://packages.rundeck.com/pagerduty/rundeck/gpgkey
+    dest: /etc/apt/keyrings/rundeck.asc
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Add official Rundeck APT repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/rundeck.asc]
+      https://packages.rundeck.com/pagerduty/rundeck/any/ any main
+    filename: rundeck
+    state: present
+    update_cache: true
 
 - name: Install Rundeck package
   ansible.builtin.apt:
     name: "{{ rundeck_package_name }}{{ ('=' + rundeck_version) if rundeck_version != 'latest' else '' }}"
     state: "{{ rundeck_package_state }}"
-    update_cache: true
+    update_cache: false

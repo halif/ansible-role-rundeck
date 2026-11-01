@@ -11,6 +11,10 @@ rundeck_java_package_redhat: "java-17-openjdk-headless"
 rundeck_user: rundeck
 rundeck_group: rundeck
 
+rundeck_service_name: rundeckd
+rundeck_service_enabled: true
+rundeck_service_state: started
+
 rundeck_home: /var/lib/rundeck
 rundeck_config_dir: /etc/rundeck
 rundeck_log_dir: /var/log/rundeck

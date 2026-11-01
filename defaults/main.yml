@@ -16,6 +16,11 @@ rundeck_config_dir: /etc/rundeck
 rundeck_log_dir: /var/log/rundeck
 rundeck_base_dir: /var/lib/rundeck
 
+# Сеть / URL, под которым Rundeck доступен снаружи
+rundeck_server_hostname: "{{ ansible_fqdn | default(ansible_default_ipv4.address) }}"
+rundeck_server_port: 4440
+rundeck_grails_server_url: "http://{{ rundeck_server_hostname }}:{{ rundeck_server_port }}"
+
 rundeck_database_host: "localhost"
 rundeck_database_port: "{{ '3306' if rundeck_database_type == 'mysql' else '5432' }}"
 rundeck_database_name: "rundeck"

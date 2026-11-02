@@ -1,0 +1,48 @@
+---
+- name: Ensure Rundeck directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_group }}"
+    mode: "0750"
+  loop:
+    - "{{ rundeck_base_dir }}"
+    - "{{ rundeck_base_dir }}/data"
+    - "{{ rundeck_log_dir }}"
+
+- name: Deploy rundeck-config.properties
+  ansible.builtin.template:
+    src: rundeck-config.properties.j2
+    dest: "{{ rundeck_config_dir }}/rundeck-config.properties"
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_group }}"
+    mode: "0640"
+  notify: Restart Rundeck
+
+- name: Deploy framework.properties
+  ansible.builtin.template:
+    src: framework.properties.j2
+    dest: "{{ rundeck_config_dir }}/framework.properties"
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_group }}"
+    mode: "0640"
+  notify: Restart Rundeck
+
+- name: Deploy realm.properties (basic auth users)
+  ansible.builtin.template:
+    src: realm.properties.j2
+    dest: "{{ rundeck_config_dir }}/realm.properties"
+    owner: "{{ rundeck_user }}"
+    group: "{{ rundeck_group }}"
+    mode: "0640"
+  notify: Restart Rundeck
+
+- name: Deploy Rundeck service defaults
+  ansible.builtin.template:
+    src: rundeckd.j2
+    dest: /etc/default/rundeckd
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Rundeck

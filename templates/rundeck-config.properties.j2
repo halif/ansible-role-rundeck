@@ -1,0 +1,15 @@
+grails.serverURL={{ rundeck_grails_server_url }}
+
+dataSource.dbCreate = update
+dataSource.driverClassName = {{ rundeck_database_driver }}
+dataSource.url = {{ rundeck_database_url }}
+{% if rundeck_database_username %}
+dataSource.username = {{ rundeck_database_username }}
+dataSource.password = {{ rundeck_database_password }}
+{% endif %}
+
+rundeck.log4j.config.file = {{ rundeck_config_dir }}/log4j2.properties
+
+{% for key, value in rundeck_framework_properties.items() %}
+{{ key }} = {{ value }}
+{% endfor %}

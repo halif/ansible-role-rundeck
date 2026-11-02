@@ -1,0 +1,60 @@
+---
+- name: Verify Rundeck installation
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Verify Rundeck package
+      ansible.builtin.assert:
+        that:
+          - "'rundeck' in ansible_facts.packages"
+        fail_msg: "Rundeck package is not installed"
+        success_msg: "Rundeck package is installed"
+
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Verify Rundeck service exists
+      ansible.builtin.assert:
+        that:
+          - "'rundeckd.service' in ansible_facts.services"
+        fail_msg: "Rundeck systemd service was not found"
+
+    - name: Verify Rundeck service is running
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['rundeckd.service'].state == 'running'
+        fail_msg: "Rundeck service is not running"
+        success_msg: "Rundeck service is running"
+
+    - name: Find Rundeck SysV startup links
+      ansible.builtin.find:
+        paths:
+          - /etc/rc2.d
+          - /etc/rc3.d
+          - /etc/rc4.d
+          - /etc/rc5.d
+        patterns: "S??rundeckd"
+        file_type: link
+      register: rundeck_sysv_startup_links
+      when: ansible_os_family == "Debian"
+
+    - name: Verify Rundeck SysV service is enabled
+      ansible.builtin.assert:
+        that:
+          - rundeck_sysv_startup_links.matched | int > 0
+        fail_msg: "Rundeck SysV startup links are missing"
+        success_msg: "Rundeck SysV service is enabled"
+      when: ansible_os_family == "Debian"
+
+    - name: Verify Rundeck systemd service is enabled
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['rundeckd.service'].status == 'enabled'
+        fail_msg: "Rundeck systemd service is not enabled"
+      when: ansible_os_family == "RedHat"

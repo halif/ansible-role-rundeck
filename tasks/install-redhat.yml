@@ -1,0 +1,25 @@
+---
+- name: Install prerequisites
+  ansible.builtin.dnf:
+    name:
+      - curl
+    state: present
+
+- name: Download Rundeck RPM repository setup script
+  ansible.builtin.get_url:
+    url: https://packagecloud.io/install/repositories/pagerduty/rundeck/script.rpm.sh
+    dest: /tmp/rundeck-packagecloud-rpm.sh
+    mode: "0755"
+    force: false
+
+- name: Add Rundeck RPM repository
+  ansible.builtin.command:
+    argv:
+      - bash
+      - /tmp/rundeck-packagecloud-rpm.sh
+    creates: /etc/yum.repos.d/pagerduty_rundeck.repo
+
+- name: Install Rundeck package
+  ansible.builtin.dnf:
+    name: "{{ rundeck_package_name }}{{ ('-' + rundeck_version) if rundeck_version != 'latest' else '' }}"
+    state: "{{ rundeck_package_state }}"

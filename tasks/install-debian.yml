@@ -1,0 +1,45 @@
+---
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - gnupg
+      - apt-transport-https
+    state: present
+    update_cache: true
+
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Remove obsolete Packagecloud repository
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/pagerduty_rundeck.list
+    state: absent
+
+- name: Download Rundeck repository signing key
+  ansible.builtin.get_url:
+    url: https://packages.rundeck.com/pagerduty/rundeck/gpgkey
+    dest: /etc/apt/keyrings/rundeck.asc
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Add official Rundeck APT repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/etc/apt/keyrings/rundeck.asc]
+      https://packages.rundeck.com/pagerduty/rundeck/any/ any main
+    filename: rundeck
+    state: present
+    update_cache: true
+
+- name: Install Rundeck package
+  ansible.builtin.apt:
+    name: "{{ rundeck_package_name }}{{ ('=' + rundeck_version) if rundeck_version != 'latest' else '' }}"
+    state: "{{ rundeck_package_state }}"
+    update_cache: false

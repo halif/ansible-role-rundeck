@@ -38,8 +38,16 @@
 - name: Configure Rundeck
   ansible.builtin.include_tasks: configure.yml
 
-- name: Ensure Rundeck service is enabled and started
+- name: Ensure Rundeck SysV service is enabled and started
+  ansible.builtin.sysvinit:
+    name: rundeckd
+    enabled: "{{ rundeck_service_enabled }}"
+    state: "{{ rundeck_service_state }}"
+  when: ansible_os_family == "Debian"
+
+- name: Ensure Rundeck systemd service is enabled and started
   ansible.builtin.systemd:
     name: "{{ rundeck_service_name }}"
     enabled: "{{ rundeck_service_enabled }}"
     state: "{{ rundeck_service_state }}"
+  when: ansible_os_family == "RedHat"

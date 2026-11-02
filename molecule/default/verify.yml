@@ -32,9 +32,29 @@
         fail_msg: "Rundeck service is not running"
         success_msg: "Rundeck service is running"
 
-    - name: Verify Rundeck service is enabled
+    - name: Find Rundeck SysV startup links
+      ansible.builtin.find:
+        paths:
+          - /etc/rc2.d
+          - /etc/rc3.d
+          - /etc/rc4.d
+          - /etc/rc5.d
+        patterns: "S??rundeckd"
+        file_type: link
+      register: rundeck_sysv_startup_links
+      when: ansible_os_family == "Debian"
+
+    - name: Verify Rundeck SysV service is enabled
+      ansible.builtin.assert:
+        that:
+          - rundeck_sysv_startup_links.matched | int > 0
+        fail_msg: "Rundeck SysV startup links are missing"
+        success_msg: "Rundeck SysV service is enabled"
+      when: ansible_os_family == "Debian"
+
+    - name: Verify Rundeck systemd service is enabled
       ansible.builtin.assert:
         that:
           - ansible_facts.services['rundeckd.service'].status == 'enabled'
-        fail_msg: "Rundeck service is not enabled"
-        success_msg: "Rundeck service is enabled"
+        fail_msg: "Rundeck systemd service is not enabled"
+      when: ansible_os_family == "RedHat"
